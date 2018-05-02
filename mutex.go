@@ -40,8 +40,6 @@ type RWMutex struct {
 	Sampler    func() bool
 }
 
-var timeNow = time.Now
-
 func (m *RMutex) Lock() {
 	if m.Sampler == nil || !m.Sampler() {
 		m.Mutex.Lock()
