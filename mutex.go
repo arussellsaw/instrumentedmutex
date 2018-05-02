@@ -33,16 +33,16 @@ func (m *Mutex) Lock() {
 }
 
 type RWMutex struct {
-	sync.Mutex
+	sync.RWMutex
 
 	RecordRead func(time.Duration)
 	Record     func(time.Duration)
 	Sampler    func() bool
 }
 
-func (m *RMutex) Lock() {
+func (m *RWMutex) Lock() {
 	if m.Sampler == nil || !m.Sampler() {
-		m.Mutex.Lock()
+		m.RWMutex.Lock()
 		return
 	}
 	c := make(chan struct{}, 1)
@@ -53,14 +53,14 @@ func (m *RMutex) Lock() {
 			m.Record(timeNow().Sub(start))
 		}
 	}()
-	m.Mutex.Lock()
+	m.RWMutex.Lock()
 	c <- struct{}{}
 	return
 }
 
-func (m *RMutex) RLock() {
+func (m *RWMutex) RLock() {
 	if m.Sampler == nil || !m.Sampler() {
-		m.Mutex.RLock()
+		m.RWMutex.RLock()
 		return
 	}
 	c := make(chan struct{}, 1)
@@ -71,7 +71,7 @@ func (m *RMutex) RLock() {
 			m.RecordRead(timeNow().Sub(start))
 		}
 	}()
-	m.Mutex.RLock()
+	m.RWMutex.RLock()
 	c <- struct{}{}
 	return
 }
