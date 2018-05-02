@@ -23,7 +23,7 @@ func (m *Mutex) Lock() {
 	go func() {
 		start := timeNow()
 		<-c
-		m.Record(time.Since(start))
+		m.Record(timeNow().Sub(start))
 	}()
 	m.Mutex.Lock()
 	c <- struct{}{}
