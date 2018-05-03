@@ -140,6 +140,21 @@ func TestSampler(t *testing.T) {
 			in:       10,
 			expected: 0,
 		},
+		{
+			n:        10,
+			in:       10,
+			expected: 10,
+		},
+		{
+			n:        3,
+			in:       10,
+			expected: 3,
+		},
+		{
+			n:        2,
+			in:       10000,
+			expected: 2,
+		},
 	}
 	for i := range tc {
 		t.Run(fmt.Sprintf("%vin%v", tc[i].n, tc[i].in), func(t *testing.T) {
