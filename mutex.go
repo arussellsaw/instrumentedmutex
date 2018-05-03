@@ -20,8 +20,8 @@ func (m *Mutex) Lock() {
 		return
 	}
 	c := make(chan struct{}, 1)
+	start := timeNow()
 	go func() {
-		start := timeNow()
 		<-c
 		if m.Record != nil {
 			m.Record(timeNow().Sub(start))
@@ -46,8 +46,8 @@ func (m *RWMutex) Lock() {
 		return
 	}
 	c := make(chan struct{}, 1)
+	start := timeNow()
 	go func() {
-		start := timeNow()
 		<-c
 		if m.Record != nil {
 			m.Record(timeNow().Sub(start))
@@ -64,8 +64,8 @@ func (m *RWMutex) RLock() {
 		return
 	}
 	c := make(chan struct{}, 1)
+	start := timeNow()
 	go func() {
-		start := timeNow()
 		<-c
 		if m.RecordRead != nil {
 			m.RecordRead(timeNow().Sub(start))
