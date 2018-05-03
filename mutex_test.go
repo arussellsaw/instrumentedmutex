@@ -18,14 +18,12 @@ func TestNoSamplerDoesntRecord(t *testing.T) {
 
 func TestSamplerRecords(t *testing.T) {
 	var (
-		called    bool
-		writeChan = make(chan struct{})
+		called bool
 	)
 	m := Mutex{
 		Sampler: func() bool { return true },
 		Record: func(d time.Duration) {
 			called = true
-			writeChan <- struct{}{}
 			if d != 10*time.Second {
 				t.Errorf("expected 10s, got %s", d)
 			}
@@ -44,7 +42,6 @@ func TestSamplerRecords(t *testing.T) {
 	go func() {
 		m.Lock()
 		m.Unlock()
-		<-writeChan
 		if !called {
 			t.Errorf("expected Record func to be called")
 		}
@@ -72,22 +69,18 @@ func TestRWNoSamplerDoesntRecord(t *testing.T) {
 func TestRWSamplerRecords(t *testing.T) {
 	var (
 		called, rCalled bool
-		readChan        = make(chan struct{})
-		writeChan       = make(chan struct{})
 	)
 
 	m := RWMutex{
 		Sampler: func() bool { return true },
 		Record: func(d time.Duration) {
 			called = true
-			writeChan <- struct{}{}
 			if d != 10*time.Second {
 				t.Errorf("expected 10s, got %s", d)
 			}
 		},
 		RecordRead: func(d time.Duration) {
 			rCalled = true
-			readChan <- struct{}{}
 			if d != 10*time.Second {
 				t.Errorf("expected 10s, got %s", d)
 			}
@@ -106,7 +99,6 @@ func TestRWSamplerRecords(t *testing.T) {
 	go func() {
 		m.Lock()
 		m.Unlock()
-		<-writeChan
 		if !called {
 			t.Errorf("expected Record func to be called")
 		}
@@ -124,7 +116,6 @@ func TestRWSamplerRecords(t *testing.T) {
 	go func() {
 		m.RLock()
 		m.RUnlock()
-		<-readChan
 		if !rCalled {
 			t.Errorf("expected RecordRead func to be called")
 		}

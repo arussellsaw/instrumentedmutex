@@ -19,17 +19,11 @@ func (m *Mutex) Lock() {
 		m.Mutex.Lock()
 		return
 	}
-	c := make(chan struct{}, 1)
 	start := timeNow()
-	go func() {
-		<-c
-		if m.Record != nil {
-			m.Record(timeNow().Sub(start))
-		}
-	}()
 	m.Mutex.Lock()
-	c <- struct{}{}
-	return
+	if m.Record != nil {
+		m.Record(timeNow().Sub(start))
+	}
 }
 
 type RWMutex struct {
@@ -45,17 +39,11 @@ func (m *RWMutex) Lock() {
 		m.RWMutex.Lock()
 		return
 	}
-	c := make(chan struct{}, 1)
 	start := timeNow()
-	go func() {
-		<-c
-		if m.Record != nil {
-			m.Record(timeNow().Sub(start))
-		}
-	}()
 	m.RWMutex.Lock()
-	c <- struct{}{}
-	return
+	if m.Record != nil {
+		m.Record(timeNow().Sub(start))
+	}
 }
 
 func (m *RWMutex) RLock() {
@@ -63,15 +51,9 @@ func (m *RWMutex) RLock() {
 		m.RWMutex.RLock()
 		return
 	}
-	c := make(chan struct{}, 1)
 	start := timeNow()
-	go func() {
-		<-c
-		if m.RecordRead != nil {
-			m.RecordRead(timeNow().Sub(start))
-		}
-	}()
 	m.RWMutex.RLock()
-	c <- struct{}{}
-	return
+	if m.RecordRead != nil {
+		m.RecordRead(timeNow().Sub(start))
+	}
 }
