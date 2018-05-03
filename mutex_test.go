@@ -1,6 +1,7 @@
 package instrumentedmutex
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -126,4 +127,32 @@ func TestRWSamplerRecords(t *testing.T) {
 	}()
 	m.Unlock()
 	wg.Wait()
+}
+
+func TestSampler(t *testing.T) {
+	var tc = []struct {
+		n        int
+		in       int
+		expected int
+	}{
+		{
+			n:        0,
+			in:       10,
+			expected: 0,
+		},
+	}
+	for i := range tc {
+		t.Run(fmt.Sprintf("%vin%v", tc[i].n, tc[i].in), func(t *testing.T) {
+			s := NewSampler(tc[i].n, tc[i].in)
+			r := 0
+			for j := 0; j < tc[i].in; j++ {
+				if s() {
+					r++
+				}
+			}
+			if r != tc[i].expected {
+				t.Errorf("expected %v, got %v", tc[i].expected, r)
+			}
+		})
+	}
 }
